@@ -3,7 +3,7 @@ const EventEmitter = require('events')
 const {createConnection} = require('net')
 const debug = require('util').debuglog('xredis')
 const Resper = require('resper')
-const {request} = require('./utils/tools')
+const {request, resper} = require('./utils/tools')
 
 class XRedis extends EventEmitter {
   constructor ({
@@ -12,6 +12,7 @@ class XRedis extends EventEmitter {
   } = {}) {
     super()
     this.client = createConnection({host, port})
+    this.client.pipe(resper)
   }
 
   async callMethod (method = '', params = []) {
@@ -19,8 +20,7 @@ class XRedis extends EventEmitter {
     debug('Method array: %j', [method, ...params])
     let encodedReq = Resper.encodeRequestArray([method, ...params])
 
-    let resBuffer = await request(this.client, encodedReq)
-    return Resper.decode(resBuffer)[0]
+    return await request(this.client, encodedReq)
   }
 }
 

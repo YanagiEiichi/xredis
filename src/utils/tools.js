@@ -1,18 +1,30 @@
 'use strict'
+const debug = require('util').debuglog('xredis')
+const Resper = require('resper')
+
+let resper = new Resper()
+let jobsQue = []
+
+resper.on('data', function (result) {
+  debug('Get data: %j', result)
+
+  jobsQue.shift().resolve(result)
+})
+
+resper.on('error', function (error) {
+  debug('Get error: %j', error)
+
+  if (jobsQue.length === 0) return
+  jobsQue.shift().reject(error)
+})
 
 module.exports = {
+  resper,
   request: function (client, req) {
     return new Promise((resolve, reject) => {
-      let chunks = []
-      let len = 0
+      jobsQue.push({resolve, reject})
 
-      client.end(req)
-      client.on('data', (chunk) => {
-        chunks.push(chunk)
-        len += chunk.length
-      })
-      client.on('end', () => resolve(Buffer.concat(chunks, len)))
-      client.on('error', reject)
+      client.write(req)
     })
   }
 }
