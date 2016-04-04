@@ -1,6 +1,6 @@
 'use strict'
 
-let cmds = [
+module.exports = [
   'append',
   'auth',
   'bgrewriteaof',
@@ -12,7 +12,7 @@ let cmds = [
   'blpop',
   'brpoplpush',
   'client',
-  'cluster',
+  // 'cluster',
   'command',
   'config',
   'dbsize',
@@ -165,5 +165,3 @@ let cmds = [
   'hscan',
   'zscan'
 ]
-
-module.exports = cmds

@@ -10,16 +10,11 @@ class XRedis extends EventEmitter {
     port = 6379
   } = {}) {
     super()
+    let client = this.client = createConnection({host, port})
+    this.client.unref()
+    this.client.pipe(resper)
 
-    let client = createConnection({host, port})
-    client.unref()
-    client.pipe(resper)
-
-    for (let cmd of cmds) {
-      this[cmd] = callMethod.bind(this, client, cmd)
-    }
-
-    this.client = client
+    for (let cmd of cmds) { this[cmd] = callMethod.bind(this, client, cmd) }
   }
 }
 

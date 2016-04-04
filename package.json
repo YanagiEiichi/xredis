@@ -13,7 +13,7 @@
   "author": "DavidCai1993 <davidcai1993@yahoo.com> (https://fucku.singles/)",
   "license": "MIT",
   "dependencies": {
-    "resper": "^1.0.0"
+    "resper": "^1.1.0"
   },
   "devDependencies": {
     "babel-cli": "^6.6.5",

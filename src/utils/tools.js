@@ -14,20 +14,22 @@ resper.on('data', function (result) {
 resper.on('error', function (error) {
   debug('Get error: %j', error)
 
-  if (jobsQue.length === 0) return
   jobsQue.shift().reject(error)
 })
 
-function request (client, req) {
+function request (client, buffer) {
   return new Promise((resolve, reject) => {
     jobsQue.push({resolve, reject})
 
-    client.write(req)
+    debug('Write data: %j', buffer.toString())
+    client.write(buffer)
   })
 }
 
-async function callMethod (client, method = '', ...params) {
-  if (!Array.isArray(params)) throw new Error('params should be an array')
+async function callMethod (client, method, ...params) {
+  if (!Array.isArray(params)) throw new Error(`Params: ${params} should be an array`)
+  if (!method) throw new Error('Method is required')
+
   debug('Get method array: %j', [method, ...params])
 
   let encodedReq = Resper.encodeRequestArray([method, ...params])
