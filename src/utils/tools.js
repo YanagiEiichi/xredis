@@ -18,13 +18,15 @@ resper.on('error', function (error) {
   jobsQue.shift().reject(error)
 })
 
+function request (client, req) {
+  return new Promise((resolve, reject) => {
+    jobsQue.push({resolve, reject})
+
+    client.write(req)
+  })
+}
+
 module.exports = {
   resper,
-  request: function (client, req) {
-    return new Promise((resolve, reject) => {
-      jobsQue.push({resolve, reject})
-
-      client.write(req)
-    })
-  }
+  request
 }

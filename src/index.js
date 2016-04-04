@@ -12,14 +12,15 @@ class XRedis extends EventEmitter {
   } = {}) {
     super()
     this.client = createConnection({host, port})
+    this.client.unref()
     this.client.pipe(resper)
   }
 
   async callMethod (method = '', params = []) {
     if (!Array.isArray(params)) throw new Error('params should be an array')
     debug('Method array: %j', [method, ...params])
-    let encodedReq = Resper.encodeRequestArray([method, ...params])
 
+    let encodedReq = Resper.encodeRequestArray([method, ...params])
     return await request(this.client, encodedReq)
   }
 }
