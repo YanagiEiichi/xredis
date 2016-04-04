@@ -1,9 +1,8 @@
 'use strict'
 const EventEmitter = require('events')
 const {createConnection} = require('net')
-const debug = require('util').debuglog('xredis')
-const Resper = require('resper')
-const {request, resper} = require('./utils/tools')
+const {callMethod, resper} = require('./utils/tools')
+const cmds = require('./cmds')
 
 class XRedis extends EventEmitter {
   constructor ({
@@ -11,17 +10,16 @@ class XRedis extends EventEmitter {
     port = 6379
   } = {}) {
     super()
-    this.client = createConnection({host, port})
-    this.client.unref()
-    this.client.pipe(resper)
-  }
 
-  async callMethod (method = '', params = []) {
-    if (!Array.isArray(params)) throw new Error('params should be an array')
-    debug('Method array: %j', [method, ...params])
+    let client = createConnection({host, port})
+    client.unref()
+    client.pipe(resper)
 
-    let encodedReq = Resper.encodeRequestArray([method, ...params])
-    return await request(this.client, encodedReq)
+    for (let cmd of cmds) {
+      this[cmd] = callMethod.bind(this, client, cmd)
+    }
+
+    this.client = client
   }
 }
 

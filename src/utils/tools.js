@@ -26,7 +26,16 @@ function request (client, req) {
   })
 }
 
+async function callMethod (client, method = '', ...params) {
+  if (!Array.isArray(params)) throw new Error('params should be an array')
+  debug('Get method array: %j', [method, ...params])
+
+  let encodedReq = Resper.encodeRequestArray([method, ...params])
+  return await request(client, encodedReq)
+}
+
 module.exports = {
   resper,
-  request
+  request,
+  callMethod
 }
